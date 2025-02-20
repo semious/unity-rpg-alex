@@ -201,7 +201,7 @@ Transform:
   m_GameObject: {fileID: 140318370}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.19, y: -2.95, z: 0.0000000070417}
+  m_LocalPosition: {x: -1.05, y: -3.3, z: 0.17}
   m_LocalScale: {x: 11.036855, y: 0.59766144, z: 1.0792009}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -264,6 +264,7 @@ GameObject:
   - component: {fileID: 198783993}
   - component: {fileID: 198783995}
   - component: {fileID: 198783996}
+  - component: {fileID: 198783997}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -332,7 +333,7 @@ Transform:
   m_GameObject: {fileID: 198783992}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.34, y: 1.79, z: 0}
+  m_LocalPosition: {x: -1.6, y: 1.74, z: 0}
   m_LocalScale: {x: 0.59516555, y: 0.59516555, z: 0.59516555}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -353,8 +354,8 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 1.5
   m_AngularDrag: 0.05
-  m_GravityScale: 5
-  m_Material: {fileID: 0}
+  m_GravityScale: 1
+  m_Material: {fileID: 6200000, guid: 672eb026cdb95df419211947b234f8b3, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -400,6 +401,18 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &198783997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 198783992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 668efb19a3471934c96164f31d4ec45c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
