@@ -381,7 +381,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 4
   jumpForce: 6.04
-  isMoving: 0
 --- !u!70 &198783998
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
