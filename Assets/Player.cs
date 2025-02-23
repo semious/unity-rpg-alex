@@ -11,6 +11,16 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpForce;
 
+    [Header("Dash Info")]
+    [SerializeField] private float dashDuration;
+    [SerializeField] private float dashTime;
+    [SerializeField] private float dashSpeed;
+    [SerializeField] private float dashCooldownTImer;
+
+    [Header("Attack Info")]
+    [SerializeField] private bool isAttacking;
+    [SerializeField] private int comboCounter;
+
     private int facingDirection = 1;
     private bool facingRight = true;
 
@@ -21,26 +31,41 @@ public class Player : MonoBehaviour
 
 
     private float xInput;
-    // Start is called before the first frame update
     void Start()
     {
-        //Debug.Log("Start");
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponentInChildren<Animator>();
     }
 
-    // Update is called once per frame
     void Update()
     {
 
         Movement();
         CheckInput();
-
         CollisionChecks();
+
+        DashAbility();
 
         FlipController();
         AnimatorControllers();
 
+    }
+
+    private void DashAbility()
+    {
+        dashTime -= Time.deltaTime;
+       if (!(dashCooldownTImer < 0) ) dashCooldownTImer -= Time.deltaTime;
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && dashCooldownTImer < 0)
+        {
+            dashTime = dashDuration;
+            dashCooldownTImer = 2.0f;
+        }
+    }
+
+    public void AttackOver()
+    {
+        isAttacking = false;
     }
 
     private void CollisionChecks()
@@ -51,9 +76,12 @@ public class Player : MonoBehaviour
     private void CheckInput()
     {
 
-        xInput = Input.GetAxisRaw("Horizontal");
+        if(Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            isAttacking = true;
+        }
 
-        if (Input.GetButtonDown("Jump"))
+         if (Input.GetButtonDown("Jump"))
         {
             Jump();
         }
@@ -61,7 +89,16 @@ public class Player : MonoBehaviour
 
     private void Movement()
     {
-        rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
+        xInput = Input.GetAxisRaw("Horizontal");
+
+        if (dashTime>0)
+        {
+            rb.velocity = new Vector2(dashSpeed * xInput, 0);
+        }
+        else
+        {
+            rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y); 
+        }
     }
 
     private void Jump()
@@ -76,8 +113,11 @@ public class Player : MonoBehaviour
 
         anim.SetFloat("yVelocity", rb.velocity.y); 
 
-        anim.SetBool("isMoving", isMoving); 
+        anim.SetBool("isMoving", isMoving);
         anim.SetBool("isGrounded", isGrounded);
+        anim.SetBool("isDashing", dashTime > 0);
+        anim.SetBool("isAttacking", isAttacking);
+        anim.SetInteger("comboCounter", comboCounter);
     }
 
     private void Flip()
