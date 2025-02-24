@@ -85,7 +85,7 @@ public class Player : Entity
 
     private void StartAttackEvent()
     {
-        if(!isGrounded)
+        if (!isGrounded)
         {
             return;
         }
@@ -120,7 +120,7 @@ public class Player : Entity
 
     private void Jump()
     {
-       
+
         if (isGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
@@ -152,5 +152,5 @@ public class Player : Entity
         }
     }
 
- 
+
 }
