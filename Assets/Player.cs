@@ -2,12 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : Entity
 {
-    private Rigidbody2D rb;
-    private Animator anim;
-   
-
+    [Header("Move Info")]
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpForce;
 
@@ -18,33 +15,34 @@ public class Player : MonoBehaviour
     [SerializeField] private float dashCooldownTImer;
 
     [Header("Attack Info")]
-    [SerializeField] private bool isAttacking;
-    [SerializeField] private int comboCounter;
-
-    private int facingDirection = 1;
-    private bool facingRight = true;
-
-    [Header("Collision Info")]
-    [SerializeField] private float groundCheckDistance;
-    [SerializeField] private LayerMask whatIsGround;
-    private bool isGrounded;
+    [SerializeField] private float comboTime = 0.3f;
+    private float comboTimeWindow;
+    private bool isAttacking;
+    private int comboCounter;
 
 
     private float xInput;
-    void Start()
+
+    protected override void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        anim = GetComponentInChildren<Animator>();
+        base.Start();
     }
 
-    void Update()
+    protected override void Update()
     {
 
-        Movement();
-        CheckInput();
-        CollisionChecks();
+        base.Update();
 
-        DashAbility();
+        CheckInput();
+
+        Movement();
+
+        dashTime -= Time.deltaTime;
+        if (!(dashCooldownTImer < 0)) dashCooldownTImer -= Time.deltaTime;
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+            DashAbility();
+
+        comboTimeWindow -= Time.deltaTime;
 
         FlipController();
         AnimatorControllers();
@@ -53,78 +51,93 @@ public class Player : MonoBehaviour
 
     private void DashAbility()
     {
-        dashTime -= Time.deltaTime;
-       if (!(dashCooldownTImer < 0) ) dashCooldownTImer -= Time.deltaTime;
-
-        if (Input.GetKeyDown(KeyCode.LeftShift) && dashCooldownTImer < 0)
+        if (dashCooldownTImer < 0 && !isAttacking)
         {
             dashTime = dashDuration;
             dashCooldownTImer = 2.0f;
+
         }
     }
 
     public void AttackOver()
     {
         isAttacking = false;
+
+        comboCounter++;
+
+        if (comboCounter > 2)
+            comboCounter = 0;
     }
 
-    private void CollisionChecks()
-    {
-        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, whatIsGround);
-    }
 
     private void CheckInput()
     {
+        xInput = Input.GetAxisRaw("Horizontal");
 
-        if(Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            isAttacking = true;
-        }
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+            StartAttackEvent();
 
-         if (Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump"))
         {
             Jump();
         }
     }
 
+    private void StartAttackEvent()
+    {
+        if(!isGrounded)
+        {
+            return;
+        }
+
+        if (comboTimeWindow < 0)
+        {
+            comboCounter = 0;
+        }
+
+        isAttacking = true;
+        comboTimeWindow = comboTime;
+    }
+
     private void Movement()
     {
-        xInput = Input.GetAxisRaw("Horizontal");
-
-        if (dashTime>0)
+        if (isAttacking)
         {
-            rb.velocity = new Vector2(dashSpeed * xInput, 0);
+            rb.velocity = new Vector2(0, 0);
         }
         else
         {
-            rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y); 
+            if (dashTime > 0)
+            {
+                rb.velocity = new Vector2(dashSpeed * facingDirection, 0);
+            }
+            else
+            {
+                rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
+            }
         }
     }
 
     private void Jump()
     {
+       
         if (isGrounded)
+        {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        }
     }
 
     private void AnimatorControllers()
     {
-       bool isMoving = rb.velocity.x != 0;
+        bool isMoving = rb.velocity.x != 0;
 
-        anim.SetFloat("yVelocity", rb.velocity.y); 
+        anim.SetFloat("yVelocity", rb.velocity.y);
 
         anim.SetBool("isMoving", isMoving);
         anim.SetBool("isGrounded", isGrounded);
         anim.SetBool("isDashing", dashTime > 0);
         anim.SetBool("isAttacking", isAttacking);
         anim.SetInteger("comboCounter", comboCounter);
-    }
-
-    private void Flip()
-    {
-        facingDirection *= -1;
-        facingRight = !facingRight;
-        transform.Rotate(0.0f, 180.0f, 0.0f);
     }
 
     private void FlipController()
@@ -139,8 +152,5 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawLine(transform.position, new Vector3(transform.position.x, transform.position.y - groundCheckDistance));
-    }
+ 
 }
